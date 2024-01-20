@@ -1,4 +1,4 @@
-#include "pixelsort/TestPresenter.h"
+#include "feedbackloop/TestPresenter.h"
 
 #include "vkt/Buffer.h"
 #include "vkt/Device.h"
@@ -17,7 +17,7 @@
 #include <spdlog/spdlog.h>
 #include <iostream>
 
-pixelsort::TestPresenter::TestPresenter( burst::PresentContext const & inContext, burst::ImageAsset inImage )
+feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inContext, burst::ImageAsset inImage )
 :
     mContext( inContext ),
     mComputeDescriptorSetLayout(
@@ -85,7 +85,7 @@ pixelsort::TestPresenter::TestPresenter( burst::PresentContext const & inContext
 
 }
 
-pixelsort::TestPresenter::~TestPresenter()
+feedbackloop::TestPresenter::~TestPresenter()
 {
     mContext.mDevice.GetVkDevice().waitIdle();
 
@@ -95,7 +95,7 @@ pixelsort::TestPresenter::~TestPresenter()
 }
 
 void
-pixelsort::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
+feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
 {
     if( !mCompute ) return;
 
@@ -164,7 +164,7 @@ pixelsort::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
 }
 
 void
-pixelsort::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
+feedbackloop::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
 {
     return;
     // Draw screen rect
@@ -200,9 +200,9 @@ pixelsort::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
 }
 
 void
-pixelsort::TestPresenter::Update( float inDelta )
+feedbackloop::TestPresenter::Update( float inDelta )
 {
-    ImGui::Begin("Pixelsort");
+    ImGui::Begin("feedbackloop");
     {
         ImGui::Button( "Compute" );
         mCompute = ImGui::IsItemActive();
@@ -235,7 +235,7 @@ pixelsort::TestPresenter::Update( float inDelta )
 }
 
 void
-pixelsort::TestPresenter::WriteImage( burst::ImageAsset inImage )
+feedbackloop::TestPresenter::WriteImage( burst::ImageAsset inImage )
 {
     // Buffer
     auto stagingBuffer = vkt::BufferFactory( mContext.mDevice ).CreateBuffer
@@ -283,7 +283,7 @@ pixelsort::TestPresenter::WriteImage( burst::ImageAsset inImage )
 }
 
 void
-pixelsort::TestPresenter::WriteMaskImage()
+feedbackloop::TestPresenter::WriteMaskImage()
 {
     glm::vec2 imageSize = glm::vec2( mMaskImage.mImage->GetWidth(), mMaskImage.mImage->GetHeight() );
     auto drawBuffer = vkt::BufferFactory( mContext.mDevice ).CreateBuffer
@@ -413,7 +413,7 @@ pixelsort::TestPresenter::WriteMaskImage()
 }
 
 void
-pixelsort::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
+feedbackloop::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
 {
     glm::vec2 pencilSize = glm::vec2( mPencilSize, mPencilSize );
 
@@ -481,8 +481,8 @@ pixelsort::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
     mContext.mDevice.EndSingleTimeCommands( commandBuffer );
 }
 
-pixelsort::TestPresenter::ImageData
-pixelsort::TestPresenter::CreateImageData( vk::Extent2D inExtent )
+feedbackloop::TestPresenter::ImageData
+feedbackloop::TestPresenter::CreateImageData( vk::Extent2D inExtent )
 {
     ImageData data;
 
@@ -564,14 +564,14 @@ pixelsort::TestPresenter::CreateImageData( vk::Extent2D inExtent )
 }
 
 void
-pixelsort::TestPresenter::DestroyImageData( const pixelsort::TestPresenter::ImageData & inImageData )
+feedbackloop::TestPresenter::DestroyImageData( const feedbackloop::TestPresenter::ImageData & inImageData )
 {
     mContext.mDevice.GetVkDevice().destroy( inImageData.mImageView );
     mContext.mDevice.GetVkDevice().destroy( inImageData.mSampler );
 }
 
 void
-pixelsort::TestPresenter::ClearPaintImage()
+feedbackloop::TestPresenter::ClearPaintImage()
 {
     auto commandBuffer = mContext.mDevice.BeginSingleTimeCommands();
     {
@@ -608,7 +608,7 @@ pixelsort::TestPresenter::ClearPaintImage()
 }
 
 void
-pixelsort::TestPresenter::SaveImage()
+feedbackloop::TestPresenter::SaveImage()
 {
     // Create a buffer to store/read the image
     std::size_t byteSize = mDisplayImage.mImage->GetWidth() * mDisplayImage.mImage->GetHeight() * 4;

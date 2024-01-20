@@ -1,5 +1,5 @@
-#ifndef pixelsort_TestPresenter_h
-#define pixelsort_TestPresenter_h
+#ifndef feedbackloop_TestPresenter_h
+#define feedbackloop_TestPresenter_h
 
 #include "burst/Presenter.h"
 #include "burst/AssetLoader.h"
@@ -14,7 +14,7 @@
 
 #include <chrono>
 
-namespace pixelsort
+namespace feedbackloop
 {
     class TestPresenter
     :
