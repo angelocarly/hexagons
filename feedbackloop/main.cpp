@@ -18,6 +18,19 @@ class ExampleEngine
             burst::Engine( inWidth, inHeight, inTitle ),
             mEmptyPresenter()
         {
+            std::uint16_t width = 512;
+            std::uint16_t height = 512;
+            auto data = std::vector< std::uint8_t >();
+            data.resize( width * height * 4 );
+            for( auto i = 0; i < width * height * 4; i += 4 )
+            {
+                data[ i + 0 ] = rand() % 255;
+                data[ i + 1 ] = rand() % 255;
+                data[ i + 2 ] = rand() % 255;
+                data[ i + 3 ] = 255;
+            }
+            burst::ImageAsset asset = { width, height, data };
+            mPresenter = std::make_shared< feedbackloop::TestPresenter >( GetPresentContext(), asset );
         }
 
         virtual void Update( float inDelta ) override
@@ -71,6 +84,6 @@ class ExampleEngine
 
 int main()
 {
-    auto engine = ExampleEngine( 1600, 900, "Pixel sort" );
+    auto engine = ExampleEngine( 1920, 1080, "Pixel sort" );
     engine.Run();
 }

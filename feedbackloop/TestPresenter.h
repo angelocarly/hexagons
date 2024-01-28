@@ -31,7 +31,8 @@ namespace feedbackloop
         private:
             void WriteImage( burst::ImageAsset inImage );
             void WriteMaskImage();
-            void ClearPaintImage();
+            void ClearMaskImage();
+            void ClearDrawImage();
 
             void PaintDrawImage( const glm::vec2 inpos );
 
@@ -49,7 +50,7 @@ namespace feedbackloop
             void SaveImage();
 
             ImageData mDisplayImage;
-            ImageData mMaskImage;
+//            ImageData mMaskImage;
             ImageData mDrawImage;
 
             burst::gui::ImageInspector mDisplayInspector;
@@ -60,26 +61,33 @@ namespace feedbackloop
             vkt::DescriptorSetLayoutsPtr mGraphicsDescriptorSetLayout;
             vkt::GraphicsPipelinePtr mPipeline;
 
-            std::chrono::microseconds mStartTime = std::chrono::duration_cast<std::chrono::microseconds>
-            (
-                std::chrono::system_clock::now().time_since_epoch()
-            );
+            bool mShouldCompute = false;
+            bool mPlaying = false;
+            float mTime = 0.0f;
+            std::size_t mFrame = 0;
+            std::size_t mTotalFrames = 0;
+            int mFrameSpeed = 1;
+            float mTimeScale = 1.0f;
+            glm::vec2 mDir = glm::vec2( 0 );
 
             struct PushConstants
             {
                 float mTime;
                 std::uint32_t mWidth;
                 std::uint32_t mHeight;
-                bool mEvenSort;
+                float mSlider0;
+                glm::vec2 mDir;
             };
 
-            bool mCompute = false;
             bool mShowMask = true;
             bool mShowDraw = true;
             bool mBlendEdges = false;
             int mBlendRange = 100;
             int mPencilSize = 20;
             int mMaskChance = 100;
+            float mSlider0 = 0.0f;
+
+            glm::vec2 mLastMouse = glm::vec2( 0 );
     };
 }
 
