@@ -9,7 +9,6 @@ layout(push_constant) uniform PushConstantsBlock
     int mWidth;
     int mHeight;
     float mSlider0;
-    vec2 mDir;
 } PushConstants;
 
 layout ( binding = 0, rgba8 ) uniform image2D outImage;

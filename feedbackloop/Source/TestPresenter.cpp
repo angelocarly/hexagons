@@ -44,7 +44,8 @@ feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inCont
 //            { mMaskImage.mSampler, mMaskImage.mImageView }
         },
         [this]( glm::vec2 inPos ){ PaintDrawImage( inPos ); }
-    )
+    ),
+    mShaderEditor( inContext.mDevice )
 {
     WriteImage( inImage );
 
@@ -84,7 +85,6 @@ feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inCont
     mContext.mDevice.GetVkDevice().destroy( fragmentShader );
 
     ClearDrawImage();
-//    ClearMaskImage();
 }
 
 feedbackloop::TestPresenter::~TestPresenter()
@@ -93,7 +93,6 @@ feedbackloop::TestPresenter::~TestPresenter()
 
     DestroyImageData( mDrawImage );
     DestroyImageData( mDisplayImage );
-//    DestroyImageData( mMaskImage );
 }
 
 void
@@ -101,8 +100,12 @@ feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
 {
     if( !mShouldCompute ) return;
 
+    auto pipeline = mShaderEditor.GetShader();
+
+    if( !pipeline ) return;
+
     // Begin pipeline
-    mComputePipeline->Bind( inCommandBuffer );
+    pipeline->Bind( inCommandBuffer );
 
     // Push image descriptor set
     auto imageInfo = vk::DescriptorImageInfo
@@ -119,7 +122,7 @@ feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
     theWriteDescriptorSet.setDescriptorCount( 1 );
     theWriteDescriptorSet.setPImageInfo( & imageInfo );
 
-    mComputePipeline->BindPushDescriptorSet( inCommandBuffer, theWriteDescriptorSet );
+    pipeline->BindPushDescriptorSet( inCommandBuffer, theWriteDescriptorSet );
 
     // Push image mask descriptor set
     auto drawImageInfo = vk::DescriptorImageInfo
@@ -136,7 +139,7 @@ feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
     writeDescriptorSet.setDescriptorCount( 1 );
     writeDescriptorSet.setPImageInfo( & drawImageInfo );
 
-    mComputePipeline->BindPushDescriptorSet( inCommandBuffer, writeDescriptorSet );
+    pipeline->BindPushDescriptorSet( inCommandBuffer, writeDescriptorSet );
 
     // Push constants
     static bool sortEven = false;
@@ -146,12 +149,11 @@ feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
         mTime,
         std::uint32_t( mDrawImage.mImage->GetWidth() ),
         std::uint32_t( mDrawImage.mImage->GetHeight() ),
-        mSlider0,
-        mDir
+        mSlider0
     };
     inCommandBuffer.pushConstants
     (
-        mComputePipeline->GetVkPipelineLayout(),
+        pipeline->GetVkPipelineLayout(),
         vk::ShaderStageFlagBits::eCompute,
         0,
         sizeof( PushConstants ),
@@ -171,27 +173,6 @@ void
 feedbackloop::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
 {
     return;
-    // Draw screen rect
-    mPipeline->Bind( inCommandBuffer );
-
-    // Push descriptor set
-    auto imageInfo = vk::DescriptorImageInfo
-    (
-        mDisplayImage.mSampler,
-        mDisplayImage.mImageView,
-        vk::ImageLayout::eGeneral
-    );
-
-    auto theWriteDescriptorSet = vk::WriteDescriptorSet();
-    theWriteDescriptorSet.setDstBinding( 0 );
-    theWriteDescriptorSet.setDstArrayElement( 0 );
-    theWriteDescriptorSet.setDescriptorType( vk::DescriptorType::eCombinedImageSampler );
-    theWriteDescriptorSet.setDescriptorCount( 1 );
-    theWriteDescriptorSet.setPImageInfo( & imageInfo );
-
-    mPipeline->BindPushDescriptorSet( inCommandBuffer, theWriteDescriptorSet );
-
-    inCommandBuffer.draw( 3, 1, 0, 0 );
 }
 
 void
@@ -199,6 +180,10 @@ feedbackloop::TestPresenter::Update( float inDelta )
 {
     ImGui::ShowDemoWindow();
 
+    mShaderEditor.Update();
+    mShaderEditor.Display();
+
+    bool mSingleCompute = false;
     ImGui::Begin("feedbackloop");
     {
         if( ImGui::Button( "Play" ) )
@@ -209,6 +194,11 @@ feedbackloop::TestPresenter::Update( float inDelta )
         if( ImGui::Button( "Pause" ) )
         {
             mPlaying = false;
+        }
+        ImGui::SameLine();
+        if( ImGui::Button( "Step" ) )
+        {
+            mSingleCompute = true;
         }
         ImGui::SameLine();
         if( ImGui::Button( "Reset" ) )
@@ -224,15 +214,15 @@ feedbackloop::TestPresenter::Update( float inDelta )
             mFrame = 0;
         }
 
-        ImGui::SliderFloat( "Dir x", &mDir[ 0 ], -1.0f, 1.0f );
-        ImGui::SliderFloat( "Dir y", &mDir[ 1 ], -1.0f, 1.0f );
-
-        ImGui::SliderFloat( "Speed", &mTimeScale, 0.01f, 2.0f );
-
-        ImGui::SliderFloat( "Slidervalue", &mSlider0, 0.0f, 1.0f );
-        ImGui::SliderInt( "FrameSpeed", &mFrameSpeed, 1, 100 );
+        ImGui::SliderFloat( "Power", &mSlider0, 0.0f, 1.0f );
+        ImGui::SliderInt( "Frame limiter", &mFrameSpeed, 1, 100 );
 
         ImGui::Text( "Frame: %zu", mFrame );
+
+        ImGui::Separator();
+
+        ImGui::Checkbox( "Show draw", & mShowDraw );
+        ImGui::SliderInt( "Pencil size", & mPencilSize, 2, 500);
 
         ImGui::Separator();
 
@@ -240,16 +230,11 @@ feedbackloop::TestPresenter::Update( float inDelta )
         {
             ClearDrawImage();
         }
-
+        ImGui::SameLine();
         if( ImGui::Button( "Export image") )
         {
             SaveImage();
         }
-
-        ImGui::Checkbox( "Show draw", & mShowDraw );
-        ImGui::Checkbox( "Blend edges", & mBlendEdges );
-        ImGui::SliderInt( "Blend range", & mBlendRange, 1, 500);
-        ImGui::SliderInt( "Pencil size", & mPencilSize, 2, 500);
     }
     ImGui::End();
 
@@ -257,7 +242,7 @@ feedbackloop::TestPresenter::Update( float inDelta )
 
     mShouldCompute = false;
     mTotalFrames++;
-    if( mPlaying && mTotalFrames % mFrameSpeed == 0 )
+    if( mPlaying && mTotalFrames % mFrameSpeed == 0 || mSingleCompute )
     {
         mShouldCompute = true;
         mFrame++;
@@ -310,118 +295,6 @@ feedbackloop::TestPresenter::WriteImage( burst::ImageAsset inImage )
     }
     mContext.mDevice.EndSingleTimeCommands( commandBuffer );
 }
-
-//void
-//feedbackloop::TestPresenter::WriteMaskImage()
-//{
-//    glm::vec2 imageSize = glm::vec2( mMaskImage.mImage->GetWidth(), mMaskImage.mImage->GetHeight() );
-//    auto drawBuffer = vkt::BufferFactory( mContext.mDevice ).CreateBuffer
-//        (
-//            sizeof( glm::vec4 ) * imageSize.x * imageSize.y,
-//            vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst,
-//            vma::AllocationCreateFlagBits::eHostAccessRandom,
-//            "MaskStagingBuffer"
-//        );
-//
-//    // Buffer
-//    auto stagingBuffer = vkt::BufferFactory( mContext.mDevice ).CreateBuffer
-//        (
-//            sizeof( glm::vec4 ) * imageSize.x * imageSize.y,
-//            vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferSrc,
-//            vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
-//            "MaskStagingBuffer"
-//        );
-//
-//    auto commandBuffer = mContext.mDevice.BeginSingleTimeCommands();
-//    {
-//
-//        commandBuffer.copyImageToBuffer
-//            (
-//                mDrawImage.mImage->GetVkImage(),
-//                vk::ImageLayout::eGeneral,
-//                drawBuffer->GetVkBuffer(),
-//                vk::BufferImageCopy
-//                    (
-//                        0,
-//                        0,
-//                        0,
-//                        vk::ImageSubresourceLayers
-//                            (
-//                                vk::ImageAspectFlagBits::eColor,
-//                                0,
-//                                0,
-//                                1
-//                            ),
-//                        vk::Offset3D( 0, 0, 0 ),
-//                        vk::Extent3D( imageSize.x, imageSize.y, 1 )
-//                    )
-//            );
-//    }
-//    mContext.mDevice.EndSingleTimeCommands( commandBuffer );
-//    commandBuffer = mContext.mDevice.BeginSingleTimeCommands();
-//    {
-//        std::uint32_t * drawData = ( std::uint32_t * ) drawBuffer->MapMemory();
-//
-//        // Store image data
-//        auto bufferData = ( std::uint8_t * ) stagingBuffer->MapMemory();
-//        {
-//            std::size_t i = 0;
-//            for( std::size_t y = 0; y < imageSize.x; y++ )
-//            {
-//                for( std::size_t x = 0; x < imageSize.y; x++ )
-//                {
-//                    bufferData[ i + 0 ] = 0;
-//                    bufferData[ i + 1 ] = 0;
-//                    bufferData[ i + 2 ] = 0;
-//                    bufferData[ i + 3 ] = 0;
-//                    i += 4;
-//                }
-//            }
-//
-//            for( std::size_t x = 0; x < imageSize.x; x++ )
-//            {
-//                for( std::size_t y = 0; y < imageSize.y; y++ )
-//                {
-//                    if( drawData[ std::uint32_t( ( y * imageSize.x + x ) ) ] > 128 )
-//                    {
-//                        std::size_t index = ( y * imageSize.x + x ) * 4;
-//                        bufferData[index + 0] = 255;
-//                        bufferData[index + 1] = 0;
-//                        bufferData[index + 2] = 0;
-//                        bufferData[index + 3] = 255;
-//                    }
-//                }
-//            }
-//        }
-//        stagingBuffer->UnMapMemory();
-//        drawBuffer->UnMapMemory();
-//
-//        // Clear the mask image
-//        commandBuffer.copyBufferToImage
-//        (
-//            stagingBuffer->GetVkBuffer(),
-//            mMaskImage.mImage->GetVkImage(),
-//            vk::ImageLayout::eGeneral,
-//            vk::BufferImageCopy
-//            (
-//                0,
-//                0,
-//                0,
-//                vk::ImageSubresourceLayers
-//                    (
-//                        vk::ImageAspectFlagBits::eColor,
-//                        0,
-//                        0,
-//                        1
-//                    ),
-//                vk::Offset3D( 0, 0, 0 ),
-//                vk::Extent3D( mMaskImage.mImage->GetWidth(), mMaskImage.mImage->GetHeight(), 1 )
-//            )
-//        );
-//    }
-//    mContext.mDevice.EndSingleTimeCommands( commandBuffer );
-//
-//}
 
 void
 feedbackloop::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
@@ -613,34 +486,6 @@ feedbackloop::TestPresenter::ClearDrawImage()
             & subResourceRange
         );
 
-    }
-    mContext.mDevice.EndSingleTimeCommands( commandBuffer );
-}
-
-void
-feedbackloop::TestPresenter::ClearMaskImage()
-{
-    auto commandBuffer = mContext.mDevice.BeginSingleTimeCommands();
-    {
-        vk::ClearColorValue cv = vk::ClearColorValue( 0.0f, 0.0f, 0.0f, 0.0f );
-
-        auto subResourceRange = vk::ImageSubresourceRange
-        (
-            vk::ImageAspectFlagBits::eColor,
-            0,
-            1,
-            0,
-            1
-        );
-
-//        commandBuffer.clearColorImage
-//        (
-//            mMaskImage.mImage->GetVkImage(),
-//            mMaskImage.mImage->GetVkImageLayout(),
-//            & cv,
-//            1,
-//            & subResourceRange
-//        );
     }
     mContext.mDevice.EndSingleTimeCommands( commandBuffer );
 }

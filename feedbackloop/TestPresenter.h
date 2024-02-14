@@ -9,6 +9,7 @@
 #include "vkt/ForwardDecl.h"
 #include "vkt/Image.h"
 #include "imgui.h"
+#include "burst/ShaderEditor.h"
 
 #include <glm/glm.hpp>
 
@@ -30,8 +31,6 @@ namespace feedbackloop
 
         private:
             void WriteImage( burst::ImageAsset inImage );
-            void WriteMaskImage();
-            void ClearMaskImage();
             void ClearDrawImage();
 
             void PaintDrawImage( const glm::vec2 inpos );
@@ -50,10 +49,11 @@ namespace feedbackloop
             void SaveImage();
 
             ImageData mDisplayImage;
-//            ImageData mMaskImage;
             ImageData mDrawImage;
 
             burst::gui::ImageInspector mDisplayInspector;
+
+            burst::ShaderEditor mShaderEditor;
 
             vkt::DescriptorSetLayoutsPtr mComputeDescriptorSetLayout;
             vkt::ComputePipelinePtr mComputePipeline;
@@ -67,7 +67,6 @@ namespace feedbackloop
             std::size_t mFrame = 0;
             std::size_t mTotalFrames = 0;
             int mFrameSpeed = 1;
-            float mTimeScale = 1.0f;
             glm::vec2 mDir = glm::vec2( 0 );
 
             struct PushConstants
@@ -76,15 +75,10 @@ namespace feedbackloop
                 std::uint32_t mWidth;
                 std::uint32_t mHeight;
                 float mSlider0;
-                glm::vec2 mDir;
             };
 
-            bool mShowMask = true;
             bool mShowDraw = true;
-            bool mBlendEdges = false;
-            int mBlendRange = 100;
             int mPencilSize = 20;
-            int mMaskChance = 100;
             float mSlider0 = 0.0f;
 
             glm::vec2 mLastMouse = glm::vec2( 0 );
