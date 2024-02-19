@@ -53,7 +53,7 @@ namespace feedbackloop
 
             burst::gui::ImageInspector mDisplayInspector;
 
-            burst::ShaderEditor mShaderEditor;
+            std::shared_ptr< burst::ShaderEditor > mShaderEditor;
 
             vkt::DescriptorSetLayoutsPtr mComputeDescriptorSetLayout;
             vkt::ComputePipelinePtr mComputePipeline;

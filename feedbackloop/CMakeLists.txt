@@ -15,6 +15,12 @@ set(
         shaders/Compute.comp
 )
 
+set(
+    GLSL_EDITING_FILES
+        shaders/dither.comp.glsl
+        shaders/compute.comp.glsl
+)
+
 add_executable(
     feedbackloop
         ${SOURCE_FILES}
@@ -44,6 +50,20 @@ add_definitions(-DZEP_SINGLE_HEADER=1)
 add_definitions(-DZEP_FEATURE_CPP_FILE_SYSTEM)
 
 target_link_libraries(feedbackloop PRIVATE Zep::Zep)
+
+# Shader editing files
+foreach( GLSL ${GLSL_EDITING_FILES} )
+
+    get_filename_component( FILE_NAME ${GLSL} NAME )
+
+    add_custom_command(
+            TARGET feedbackloop POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/resources/${GLSL}
+            ${FILE_NAME}
+    )
+
+endforeach( GLSL )
 
 # Shaders
 compile_shaders( feedbackloop "${CMAKE_SOURCE_DIR}/resources/" "${CMAKE_CURRENT_BINARY_DIR}/resources/shaders/" "${GLSL_SOURCE_FILES}" )

@@ -45,7 +45,7 @@ feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inCont
         },
         [this]( glm::vec2 inPos ){ PaintDrawImage( inPos ); }
     ),
-    mShaderEditor( inContext.mDevice )
+    mShaderEditor( std::make_shared< burst::ShaderEditor >( inContext.mDevice, "dither.comp.glsl" ) )
 {
     WriteImage( inImage );
 
@@ -100,7 +100,9 @@ feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
 {
     if( !mShouldCompute ) return;
 
-    auto pipeline = mShaderEditor.GetShader();
+    if( !mShaderEditor ) return;
+
+    auto pipeline = mShaderEditor->GetShader();
 
     if( !pipeline ) return;
 
@@ -178,10 +180,13 @@ feedbackloop::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
 void
 feedbackloop::TestPresenter::Update( float inDelta )
 {
-    ImGui::ShowDemoWindow();
+//    ImGui::ShowDemoWindow();
 
-    mShaderEditor.Update();
-    mShaderEditor.Display();
+    if( mShaderEditor )
+    {
+        mShaderEditor->Update();
+        mShaderEditor->Display();
+    }
 
     bool mSingleCompute = false;
     ImGui::Begin("feedbackloop");
@@ -234,6 +239,25 @@ feedbackloop::TestPresenter::Update( float inDelta )
         if( ImGui::Button( "Export image") )
         {
             SaveImage();
+        }
+
+        const char* items[] = { "Dither", "Draw" };
+        static int item_current = 1;
+        if( ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4) )
+        {
+            switch ( item_current )
+            {
+                case 0:
+                    mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "dither.comp.glsl" );
+                    break;
+                case 1:
+                    mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "compute.comp.glsl" );
+                    break;
+                default:
+                    break;
+            }
+
+            mShaderEditor->CompileShader();
         }
     }
     ImGui::End();
