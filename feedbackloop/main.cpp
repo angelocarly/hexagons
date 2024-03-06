@@ -4,6 +4,7 @@
 #include "burst/Engine.h"
 
 #include "TestPresenter.h"
+#include "burst/Utils.h"
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
@@ -36,8 +37,10 @@ class ExampleEngine
         virtual void Update( float inDelta ) override
         {
             ImGui::BeginMainMenuBar();
-            if (ImGui::MenuItem("Open Image.."))
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose Image", ".png", "/Users/angelo/Projects/nel.re/static/images/.");
+            if (ImGui::MenuItem("Open Image..") )
+            {
+                ImGuiFileDialog::Instance()->OpenDialog( "ChooseFileDlgKey", "Choose Image", ".png", { "/Users/angelo/Projects/nel.re/static/images/." } );
+            }
 
             // display
             if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
@@ -84,6 +87,11 @@ class ExampleEngine
 
 int main()
 {
-    auto engine = ExampleEngine( 2230, 1280, "Pixel sort" );
+    glm::ivec2 resolution = glm::ivec2( 1920, 1080 );
+    if( burst::Utils::IsTargetApple() )
+    {
+        resolution = glm::ivec2( 1520, 780 );
+    }
+    auto engine = ExampleEngine( resolution.x, resolution.y, "Pixel sort" );
     engine.Run();
 }

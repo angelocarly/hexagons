@@ -32,7 +32,6 @@ feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inCont
         .Build( vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptorKHR )
     ),
     mInitialImage( inImage ),
-//    mMaskImage( CreateImageData( vk::Extent2D( inImage.mWidth, inImage.mHeight ) ) ),
     mDrawImage( CreateImageData( vk::Extent2D( inImage.mWidth, inImage.mHeight ) ) ),
     mDisplayImage( CreateImageData( vk::Extent2D( inImage.mWidth, inImage.mHeight ) ) ),
     mDisplayInspector(
@@ -41,11 +40,10 @@ feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inCont
         {
             { mDisplayImage.mSampler, mDisplayImage.mImageView },
             { mDrawImage.mSampler, mDrawImage.mImageView }
-//            { mMaskImage.mSampler, mMaskImage.mImageView }
         },
         [this]( glm::vec2 inPos ){ PaintDrawImage( inPos ); }
     ),
-    mShaderEditor( std::make_shared< burst::ShaderEditor >( inContext.mDevice, "dither.comp.glsl" ) )
+    mShaderEditor( std::make_shared< burst::ShaderEditor >( inContext.mDevice, "zep.cfg" ) )
 {
     WriteImage( inImage );
 
@@ -241,7 +239,7 @@ feedbackloop::TestPresenter::Update( float inDelta )
             SaveImage();
         }
 
-        const char* items[] = { "Dither", "Draw" };
+        const char* items[] = { "Dither", "Draw", "Mask" };
         static int item_current = 1;
         if( ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4) )
         {
@@ -252,6 +250,9 @@ feedbackloop::TestPresenter::Update( float inDelta )
                     break;
                 case 1:
                     mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "compute.comp.glsl" );
+                    break;
+                case 2:
+                    mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "mask.comp.glsl" );
                     break;
                 default:
                     break;
