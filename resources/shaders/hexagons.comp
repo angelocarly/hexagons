@@ -1,0 +1,21 @@
+#version 450
+
+#define WORKGROUP_SIZE 16
+layout ( local_size_x = WORKGROUP_SIZE, local_size_y = WORKGROUP_SIZE, local_size_z = 1 ) in;
+
+layout(push_constant) uniform PushConstantsBlock
+{
+    int mWidth;
+    int mHeight;
+    int mhexSize;
+} PushConstants;
+
+layout ( binding = 0, rgba8 ) uniform image2D outImage;
+
+void main()
+{
+    ivec2 p = ivec2( gl_GlobalInvocationID.xy );
+    if( p.x > PushConstants.mWidth || p.y > PushConstants.mHeight ) return;
+
+    imageStore( outImage, p, vec4( 1 ) );
+}
