@@ -64,14 +64,14 @@ hex::HexagonView::Compute( vk::CommandBuffer inCommandBuffer ) const
 
     // Push image descriptor set
     auto imageInfo = mImage->CreateDescriptorImageInfo();
-    auto theWriteDescriptorSet = vk::WriteDescriptorSet();
-    theWriteDescriptorSet.setDstBinding( 0 );
-    theWriteDescriptorSet.setDstArrayElement( 0 );
-    theWriteDescriptorSet.setDescriptorType( vk::DescriptorType::eStorageImage );
-    theWriteDescriptorSet.setDescriptorCount( 1 );
-    theWriteDescriptorSet.setPImageInfo( & imageInfo );
+    auto writeDescriptorSet = vk::WriteDescriptorSet();
+    writeDescriptorSet.setDstBinding( 0 );
+    writeDescriptorSet.setDstArrayElement( 0 );
+    writeDescriptorSet.setDescriptorType( vk::DescriptorType::eStorageImage );
+    writeDescriptorSet.setDescriptorCount( 1 );
+    writeDescriptorSet.setPImageInfo( & imageInfo );
 
-    mComputePipeline->BindPushDescriptorSet( inCommandBuffer, theWriteDescriptorSet );
+    mComputePipeline->BindPushDescriptorSet( inCommandBuffer, writeDescriptorSet );
 
     // Push constants
     static bool sortEven = false;
