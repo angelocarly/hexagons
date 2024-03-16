@@ -239,7 +239,7 @@ feedbackloop::TestPresenter::Update( float inDelta )
             SaveImage();
         }
 
-        const char* items[] = { "Dither", "Draw", "Mask" };
+        const char* items[] = { "Dither", "Draw", "Mask", "Copy", "Copy to draw" };
         static int item_current = 1;
         if( ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4) )
         {
@@ -253,6 +253,12 @@ feedbackloop::TestPresenter::Update( float inDelta )
                     break;
                 case 2:
                     mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "mask.comp.glsl" );
+                    break;
+                case 3:
+                    mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "copy.comp.glsl" );
+                    break;
+                case 4:
+                    mShaderEditor = std::make_shared< burst::ShaderEditor >( mContext.mDevice, "copytodraw.comp.glsl" );
                     break;
                 default:
                     break;

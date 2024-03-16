@@ -20,6 +20,8 @@ set(
         shaders/dither.comp.glsl
         shaders/compute.comp.glsl
         shaders/mask.comp.glsl
+        shaders/copy.comp.glsl
+        shaders/copytodraw.comp.glsl
 )
 
 add_executable(
