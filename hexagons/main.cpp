@@ -31,7 +31,7 @@ class ExampleEngine
                 data[ i + 3 ] = 255;
             }
             burst::ImageAsset asset = { width, height, data };
-            mPresenter = std::make_shared< feedbackloop::TestPresenter >( GetPresentContext(), asset );
+            mPresenter = std::make_shared< hexagons::TestPresenter >( GetPresentContext(), asset );
         }
 
         virtual void Update( float inDelta ) override
@@ -53,7 +53,7 @@ class ExampleEngine
 
                     // Do something with the image
                     auto imageResource = burst::AssetLoader::LoadImage( filePathName );
-                    mPresenter = std::make_shared< feedbackloop::TestPresenter >( GetPresentContext(), imageResource );
+                    mPresenter = std::make_shared< hexagons::TestPresenter >( GetPresentContext(), imageResource );
                 }
 
                 // close
@@ -71,7 +71,7 @@ class ExampleEngine
         }
 
     private:
-        std::shared_ptr< feedbackloop::TestPresenter > mPresenter;
+        std::shared_ptr< hexagons::TestPresenter > mPresenter;
 
         class EmptyPresenter
         :

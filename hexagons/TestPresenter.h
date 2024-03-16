@@ -1,5 +1,5 @@
-#ifndef feedbackloop_TestPresenter_h
-#define feedbackloop_TestPresenter_h
+#ifndef hexagons_TestPresenter_h
+#define hexagons_TestPresenter_h
 
 #include "burst/Presenter.h"
 #include "burst/AssetLoader.h"
@@ -15,7 +15,7 @@
 
 #include <chrono>
 
-namespace feedbackloop
+namespace hexagons
 {
     class TestPresenter
     :

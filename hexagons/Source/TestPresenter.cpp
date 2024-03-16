@@ -1,4 +1,4 @@
-#include "feedbackloop/TestPresenter.h"
+#include "hexagons/TestPresenter.h"
 
 #include "vkt/Buffer.h"
 #include "vkt/Device.h"
@@ -17,7 +17,7 @@
 #include <spdlog/spdlog.h>
 #include <iostream>
 
-feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inContext, burst::ImageAsset inImage )
+hexagons::TestPresenter::TestPresenter( burst::PresentContext const & inContext, burst::ImageAsset inImage )
 :
     mContext( inContext ),
     mComputeDescriptorSetLayout(
@@ -85,7 +85,7 @@ feedbackloop::TestPresenter::TestPresenter( burst::PresentContext const & inCont
     ClearDrawImage();
 }
 
-feedbackloop::TestPresenter::~TestPresenter()
+hexagons::TestPresenter::~TestPresenter()
 {
     mContext.mDevice.GetVkDevice().waitIdle();
 
@@ -94,7 +94,7 @@ feedbackloop::TestPresenter::~TestPresenter()
 }
 
 void
-feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
+hexagons::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
 {
     if( !mShouldCompute ) return;
 
@@ -170,13 +170,13 @@ feedbackloop::TestPresenter::Compute( vk::CommandBuffer inCommandBuffer ) const
 }
 
 void
-feedbackloop::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
+hexagons::TestPresenter::Present( vk::CommandBuffer inCommandBuffer ) const
 {
     return;
 }
 
 void
-feedbackloop::TestPresenter::Update( float inDelta )
+hexagons::TestPresenter::Update( float inDelta )
 {
 //    ImGui::ShowDemoWindow();
 
@@ -187,7 +187,7 @@ feedbackloop::TestPresenter::Update( float inDelta )
     }
 
     bool mSingleCompute = false;
-    ImGui::Begin("feedbackloop");
+    ImGui::Begin("hexagons");
     {
         if( ImGui::Button( "Play" ) )
         {
@@ -281,7 +281,7 @@ feedbackloop::TestPresenter::Update( float inDelta )
 }
 
 void
-feedbackloop::TestPresenter::WriteImage( burst::ImageAsset inImage )
+hexagons::TestPresenter::WriteImage( burst::ImageAsset inImage )
 {
     // Buffer
     auto stagingBuffer = vkt::BufferFactory( mContext.mDevice ).CreateBuffer
@@ -328,7 +328,7 @@ feedbackloop::TestPresenter::WriteImage( burst::ImageAsset inImage )
 }
 
 void
-feedbackloop::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
+hexagons::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
 {
     // Only draw strokes
     if( mLastMouse == inPos ) return;
@@ -414,8 +414,8 @@ feedbackloop::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
     mContext.mDevice.EndSingleTimeCommands( commandBuffer );
 }
 
-feedbackloop::TestPresenter::ImageData
-feedbackloop::TestPresenter::CreateImageData( vk::Extent2D inExtent )
+hexagons::TestPresenter::ImageData
+hexagons::TestPresenter::CreateImageData( vk::Extent2D inExtent )
 {
     ImageData data;
 
@@ -497,14 +497,14 @@ feedbackloop::TestPresenter::CreateImageData( vk::Extent2D inExtent )
 }
 
 void
-feedbackloop::TestPresenter::DestroyImageData( const feedbackloop::TestPresenter::ImageData & inImageData )
+hexagons::TestPresenter::DestroyImageData( const hexagons::TestPresenter::ImageData & inImageData )
 {
     mContext.mDevice.GetVkDevice().destroy( inImageData.mImageView );
     mContext.mDevice.GetVkDevice().destroy( inImageData.mSampler );
 }
 
 void
-feedbackloop::TestPresenter::ClearDrawImage()
+hexagons::TestPresenter::ClearDrawImage()
 {
     auto commandBuffer = mContext.mDevice.BeginSingleTimeCommands();
     {
@@ -533,7 +533,7 @@ feedbackloop::TestPresenter::ClearDrawImage()
 }
 
 void
-feedbackloop::TestPresenter::SaveImage()
+hexagons::TestPresenter::SaveImage()
 {
     // Create a buffer to store/read the image
     std::size_t byteSize = mDisplayImage.mImage->GetWidth() * mDisplayImage.mImage->GetHeight() * 4;

@@ -25,16 +25,16 @@ set(
 )
 
 add_executable(
-    feedbackloop
+    hexagons
         ${SOURCE_FILES}
         ${HEADER_FILES}
 )
 
-set_property( TARGET feedbackloop PROPERTY CXX_STANDARD 17 )
+set_property( TARGET hexagons PROPERTY CXX_STANDARD 17 )
 
 ## Project libraries
 target_link_libraries(
-    feedbackloop PUBLIC
+    hexagons PUBLIC
         Burst
         Imgui
 )
@@ -45,14 +45,14 @@ include_directories( ${BURST_ROOT_DIR} )
 # Zep
 set( ZEP_DIR "${LIB_DIR}/burst/lib/zep" )
 target_include_directories(
-    feedbackloop
+    hexagons
         PRIVATE
         ${ZEP_DIR}/include
 )
 add_definitions(-DZEP_SINGLE_HEADER=1)
 add_definitions(-DZEP_FEATURE_CPP_FILE_SYSTEM)
 
-target_link_libraries(feedbackloop PRIVATE Zep::Zep)
+target_link_libraries(hexagons PRIVATE Zep::Zep)
 
 # Shader editing files
 foreach( GLSL ${GLSL_EDITING_FILES} )
@@ -70,10 +70,10 @@ foreach( GLSL ${GLSL_EDITING_FILES} )
 endforeach( GLSL )
 
 add_custom_target(
-        feedbackloop_runtime_shaders
+        hexagons_runtime_shaders
         DEPENDS ${RUNTIME_SHADERS}
 )
-add_dependencies( feedbackloop feedbackloop_runtime_shaders )
+add_dependencies( hexagons hexagons_runtime_shaders )
 
 # Shaders
-compile_shaders( feedbackloop "${CMAKE_SOURCE_DIR}/resources/" "${CMAKE_CURRENT_BINARY_DIR}/resources/shaders/" "${GLSL_SOURCE_FILES}" )
+compile_shaders( hexagons "${CMAKE_SOURCE_DIR}/resources/" "${CMAKE_CURRENT_BINARY_DIR}/resources/shaders/" "${GLSL_SOURCE_FILES}" )

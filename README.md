@@ -1,2 +1,2 @@
-# Feedback loop
-Generative art using compute shaders
+# Hexagons
+Generative art with hexagons
