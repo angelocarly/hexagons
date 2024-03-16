@@ -15,8 +15,6 @@ namespace hex
      * Maintains a single image with the hexagons, and an imgui display to view it.
      */
     class HexagonView
-    :
-        public burst::Presenter
     {
         public:
             HexagonView( const burst::PresentContext & inContext, glm::ivec2 inResolution );
@@ -24,9 +22,7 @@ namespace hex
 
             void Update( float inDelta );
 
-            void Compute( vk::CommandBuffer inCommandBuffer ) const override;
-
-            void Present( vk::CommandBuffer inCommandBuffer ) const override;
+            void Compute( vk::CommandBuffer inCommandBuffer, float inHexSize ) const;
 
         private:
             vkt::Device const & mDevice;
@@ -37,7 +33,7 @@ namespace hex
             {
                 int width;
                 int height;
-                int hexSize;
+                float hexSize;
             };
 
             vkt::DescriptorSetLayoutsPtr mComputeDescriptorSetLayout;

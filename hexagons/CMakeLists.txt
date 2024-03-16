@@ -1,12 +1,14 @@
 set(
     HEADER_FILES
         HexagonView.h
+        HexEngine.h
 )
 
 set(
     SOURCE_FILES
         main.cpp
         Source/HexagonView.cpp
+        Source/HexEngine.cpp
 )
 
 set(

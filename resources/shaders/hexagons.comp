@@ -7,15 +7,67 @@ layout(push_constant) uniform PushConstantsBlock
 {
     int mWidth;
     int mHeight;
-    int mhexSize;
+    float mhexSize; // Size in pixels
 } PushConstants;
 
 layout ( binding = 0, rgba8 ) uniform image2D outImage;
+
+#define hash(p)  fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453)
+#define hash2(p) fract(sin((p)*mat2(127.1,311.7, 269.5,183.3)) *43758.5453123)
+#define hash3(p) fract(sin((p)*mat3(127.1,311.7, 74.7,  269.5,183.3,246.1,  113.5,271.9,124.6))*43758.5453123)
+#define hash2x3(p) fract(sin((p)*mat3x2(127.1,311.7,  269.5,183.3,  113.5,271.9))*43758.5453123)
+
+vec3 screenPosToHexCoord(vec2 position, float diameter)
+{
+    mat2 hexToScreenMatrix = mat2(-1, 0, -1.0 / 2.0f, sqrt(3.0f) / 2.0);
+
+    vec2 posInHexSpace = inverse(hexToScreenMatrix) * (position / vec2(diameter));
+
+    vec3 newPos;
+    newPos.x = -posInHexSpace.x - posInHexSpace.y;
+    newPos.y = posInHexSpace.x;
+    newPos.z = posInHexSpace.y;
+
+    // How much does the position deviate from a unit coord?
+    vec3 roundDelta;
+    roundDelta.x = abs(round(newPos.x) - newPos.x);
+    roundDelta.y = abs(round(newPos.y) - newPos.y);
+    roundDelta.z = abs(round(newPos.z) - newPos.z);
+
+    // Recalculate the axis with the biggest error
+    vec3 nodepos;
+    if (roundDelta.z > roundDelta.x && roundDelta.z > roundDelta.y)
+    {
+        // Z biggest error
+        nodepos.x = round(newPos.x);
+        nodepos.y = round(newPos.y);
+        nodepos.z = -nodepos.x - nodepos.y;
+    } else if (roundDelta.y > roundDelta.x && roundDelta.y > roundDelta.z)
+    {
+        // Y biggest error
+        nodepos.x = round(newPos.x);
+        nodepos.z = round(newPos.z);
+        nodepos.y = -nodepos.x - nodepos.z;
+    } else
+    {
+        // X biggest error
+        nodepos.y = round(newPos.y);
+        nodepos.z = round(newPos.z);
+        nodepos.x = -nodepos.y - nodepos.z;
+    }
+
+    return nodepos;
+}
 
 void main()
 {
     ivec2 p = ivec2( gl_GlobalInvocationID.xy );
     if( p.x > PushConstants.mWidth || p.y > PushConstants.mHeight ) return;
 
-    imageStore( outImage, p, vec4( 1 ) );
+    // Center origin
+    vec2 worldPos = vec2( p ) - vec2( PushConstants.mWidth, PushConstants.mHeight ) / 2.0f + vec2( .5f );
+    vec3 hexPos = screenPosToHexCoord( worldPos, float( PushConstants.mhexSize ) );
+    vec3 color = hash3( hexPos );
+
+    imageStore( outImage, p, vec4( color, 1 ) );
 }

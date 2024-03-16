@@ -29,11 +29,11 @@ hex::HexagonView::HexagonView( const burst::PresentContext & inContext, glm::ive
     std::vector< vk::PushConstantRange > pushConstants =
         {
             vk::PushConstantRange
-                (
-                    vk::ShaderStageFlagBits::eCompute,
-                    0,
-                    sizeof( PushConstants )
-                )
+            (
+                vk::ShaderStageFlagBits::eCompute,
+                0,
+                sizeof( PushConstants )
+            )
         };
 
     mComputePipeline = vkt::ComputePipelineBuilder( inContext.mDevice )
@@ -57,7 +57,7 @@ hex::HexagonView::Update( float inDelta )
 }
 
 void
-hex::HexagonView::Compute( vk::CommandBuffer inCommandBuffer ) const
+hex::HexagonView::Compute( vk::CommandBuffer inCommandBuffer, float inHexSize ) const
 {
     // Begin pipeline
     mComputePipeline->Bind( inCommandBuffer );
@@ -80,7 +80,7 @@ hex::HexagonView::Compute( vk::CommandBuffer inCommandBuffer ) const
     {
         int( mImage->GetImage()->GetWidth() ),
         int( mImage->GetImage()->GetHeight() ),
-        1
+        inHexSize
     };
     mComputePipeline->PushConstants
     (
@@ -98,10 +98,4 @@ hex::HexagonView::Compute( vk::CommandBuffer inCommandBuffer ) const
         ceil( mImage->GetImage()->GetHeight() / groupsize ),
         1
     );
-}
-
-void
-hex::HexagonView::Present( vk::CommandBuffer inCommandBuffer ) const
-{
-
 }
