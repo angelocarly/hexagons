@@ -354,6 +354,8 @@ feedbackloop::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
         "MaskStagingBuffer"
     );
 
+    bool erase = ImGui::GetIO().KeyShift;
+
     // Store pencil data
     auto bufferData = ( std::uint8_t * ) stagingBuffer->MapMemory();
     {
@@ -365,10 +367,19 @@ feedbackloop::TestPresenter::PaintDrawImage( const glm::vec2 inPos )
         {
             for( std::size_t x = 0; x < pencilSize.x; x++ )
             {
-                bufferData[ i + 0 ] = mappedDir.x * 255;
-                bufferData[ i + 1 ] = mappedDir.y * 255;
-                bufferData[ i + 2 ] = 0;
-                bufferData[ i + 3 ] = 255;
+                if( erase )
+                {
+                    bufferData[i + 0] = 0;
+                    bufferData[i + 1] = 0;
+                    bufferData[i + 2] = 0;
+                    bufferData[i + 3] = 0;
+                }
+                else {
+                    bufferData[i + 0] = mappedDir.x * 255;
+                    bufferData[i + 1] = mappedDir.y * 255;
+                    bufferData[i + 2] = 0;
+                    bufferData[i + 3] = 255;
+                }
                 i += 4;
             }
         }
