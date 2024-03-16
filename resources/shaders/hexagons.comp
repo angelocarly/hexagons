@@ -59,15 +59,35 @@ vec3 screenPosToHexCoord(vec2 position, float diameter)
     return nodepos;
 }
 
+vec3 calcColor( vec2 inWorldPos )
+{
+    vec3 hexPos = screenPosToHexCoord( inWorldPos, float( PushConstants.mhexSize ) );
+    return hash3( hexPos );
+}
+
 void main()
 {
     ivec2 p = ivec2( gl_GlobalInvocationID.xy );
     if( p.x > PushConstants.mWidth || p.y > PushConstants.mHeight ) return;
 
     // Center origin
-    vec2 worldPos = vec2( p ) - vec2( PushConstants.mWidth, PushConstants.mHeight ) / 2.0f + vec2( .5f );
-    vec3 hexPos = screenPosToHexCoord( worldPos, float( PushConstants.mhexSize ) );
-    vec3 color = hash3( hexPos );
+    vec2 worldPos = vec2( p ) - floor( vec2( PushConstants.mWidth, PushConstants.mHeight ) / 2.0f );
+    worldPos += vec2( .5f );
+
+    vec3 color = vec3( 0 );
+    bool antialias = false;
+    if( antialias )
+    {
+        color += calcColor( worldPos + vec2( -.25f, -.25f ) );
+        color += calcColor( worldPos + vec2( .25f, -.25f ) );
+        color += calcColor( worldPos + vec2( .25f, .25f ) );
+        color += calcColor( worldPos + vec2( -.25f, .25f ) );
+        color /= 4.0f;
+    }
+    else
+    {
+        color = calcColor( worldPos );
+    }
 
     imageStore( outImage, p, vec4( color, 1 ) );
 }
