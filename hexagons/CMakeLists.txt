@@ -1,12 +1,12 @@
 set(
     HEADER_FILES
-        TestPresenter.h
+        HexagonView.h
 )
 
 set(
     SOURCE_FILES
-        Source/TestPresenter.cpp
         main.cpp
+        Source/HexagonView.cpp
 )
 
 set(
