@@ -20,7 +20,7 @@ class Engine
             burst::Engine( inWidth, inHeight, inTitle ),
             mEmptyPresenter()
         {
-            mPresenter = std::make_shared< hex::HexagonView >( GetPresentContext() );
+            mPresenter = std::make_shared< hex::HexagonView >( GetPresentContext(), glm::ivec2( 1024, 1024 ) );
         }
 
         virtual void Update( float inDelta ) override

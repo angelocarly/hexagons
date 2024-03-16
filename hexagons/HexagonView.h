@@ -2,6 +2,10 @@
 #define HEXAGONS_HEXAGONVIEW_H
 
 #include "burst/Presenter.h"
+#include "burst/Image.h"
+#include "burst/Gui.h"
+
+#include <glm/glm.hpp>
 
 namespace hex
 {
@@ -10,7 +14,7 @@ namespace hex
         public burst::Presenter
     {
         public:
-            HexagonView( burst::PresentContext const & inContext );
+            HexagonView( const burst::PresentContext & inContext, glm::ivec2 inResolution );
             ~HexagonView();
 
             void Update( float inDelta );
@@ -18,6 +22,10 @@ namespace hex
             void Compute( vk::CommandBuffer inCommandBuffer ) const override;
 
             void Present( vk::CommandBuffer inCommandBuffer ) const override;
+
+        private:
+            std::shared_ptr< burst::Image > mImage;
+            burst::gui::ImageInspector mImageInspector;
     };
 }
 
