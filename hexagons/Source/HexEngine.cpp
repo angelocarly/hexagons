@@ -9,6 +9,16 @@ hex::Engine::Engine( std::size_t inWidth, std::size_t inHeight, const char * inT
     mHexagonView = std::make_shared< hex::HexagonView< float, HexMapImpl::kElementCount > >( GetPresentContext(), glm::ivec2( 1024, 1024 ) );
 
     mHexMap[ { 0, 0 } ] = 1.0f;
+
+    for( int i = 0; i < 20000; i++ )
+    {
+        int x = rand() % 21 - 10;
+        int y = rand() % 21 - 10;
+        if( mHexMap.Contains( glm::ivec2( x, y ) ) )
+        {
+            mHexMap[ { x, y } ] = rand() % 1000 / 1000.0f;
+        }
+    }
 }
 
 void
