@@ -1,10 +1,14 @@
 #include "hexagons/HexEngine.h"
 
+#include "hexagons/HexMap.h"
+
 hex::Engine::Engine( std::size_t inWidth, std::size_t inHeight, const char * inTitle )
 :
     burst::Engine( inWidth, inHeight, inTitle )
 {
-    mHexagonView = std::make_shared< hex::HexagonView >( GetPresentContext(), glm::ivec2( 1024, 1024 ) );
+    mHexagonView = std::make_shared< hex::HexagonView< float, HexMapImpl::kElementCount > >( GetPresentContext(), glm::ivec2( 1024, 1024 ) );
+
+    mHexMap[ { 0, 0 } ] = 1.0f;
 }
 
 void
@@ -23,12 +27,13 @@ hex::Engine::Update( float inDelta )
 }
 
 void
-hex::Engine::Compute( vk::CommandBuffer inCommandBuffer ) const
+hex::Engine::Compute( vk::CommandBuffer inCommandBuffer )
 {
-    mHexagonView->Compute( inCommandBuffer, mHexSize );
+    auto elements = mHexMap.GetElements();
+    mHexagonView->Compute( inCommandBuffer, mHexSize, elements );
 }
 
 void
-hex::Engine::Present( vk::CommandBuffer inCommandBuffer ) const
+hex::Engine::Present( vk::CommandBuffer inCommandBuffer )
 {
 }

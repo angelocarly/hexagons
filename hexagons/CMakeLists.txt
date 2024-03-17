@@ -2,6 +2,7 @@ set(
     HEADER_FILES
         HexagonView.h
         HexEngine.h
+        HexMap.h
 )
 
 set(
@@ -9,6 +10,7 @@ set(
         main.cpp
         Source/HexagonView.cpp
         Source/HexEngine.cpp
+        Source/HexMap.cpp
 )
 
 set(
@@ -22,7 +24,7 @@ add_executable(
         ${HEADER_FILES}
 )
 
-set_property( TARGET hexagons PROPERTY CXX_STANDARD 17 )
+set_property( TARGET hexagons PROPERTY CXX_STANDARD 23 )
 
 ## Project libraries
 target_link_libraries(

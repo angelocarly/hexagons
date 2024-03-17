@@ -9,6 +9,7 @@
 #include "burst/Engine.h"
 
 #include "hexagons/HexagonView.h"
+#include "HexMap.h"
 
 namespace hex
 {
@@ -20,15 +21,18 @@ namespace hex
         public:
             Engine( std::size_t inWidth, std::size_t inHeight, const char * inTitle );
 
-            void Compute( vk::CommandBuffer inCommandBuffer ) const override;
-            void Present( vk::CommandBuffer inCommandBuffer ) const override;
+            void Compute( vk::CommandBuffer inCommandBuffer ) override;
+            void Present( vk::CommandBuffer inCommandBuffer ) override;
 
             virtual void Update( float inDelta ) override;
 
         private:
-            std::shared_ptr <hex::HexagonView> mHexagonView;
+            static const int kRadius = 10;
+            using HexMapImpl = HexMap< float, kRadius >;
+            HexMapImpl mHexMap;
 
             float mHexSize = 15.0f;
+            std::shared_ptr< hex::HexagonView< float, HexMapImpl::kElementCount > > mHexagonView;
     };
 }
 
