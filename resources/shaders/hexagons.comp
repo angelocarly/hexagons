@@ -92,11 +92,16 @@ float readHex( vec3 inHexPos )
     return inHexData.mData[ calcHexIndex( inHexPos ) ];
 }
 
+vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d )
+{
+    return a + b*cos( 6.28318*(c*t+d) );
+}
+
 vec3 calcColor( vec2 inWorldPos )
 {
     vec3 hexPos = screenPosToHexCoord( inWorldPos, float( PushConstants.mhexSize ) );
 
-    return vec3( readHex( hexPos ) );
+    return palette( readHex( hexPos ), vec3(0.5, 0.5, 0.5), vec3( 0.5, 0.5, 0.5), vec3( 1.0, 1.0, 0.5 ), vec3( 0.80, 0.90, 0.30 ) );
 }
 
 void main()

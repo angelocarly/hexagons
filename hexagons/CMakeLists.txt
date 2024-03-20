@@ -3,6 +3,8 @@ set(
         HexagonView.h
         HexEngine.h
         HexMap.h
+        HexCompute.h
+        GridUtils.h
 )
 
 set(
@@ -11,6 +13,8 @@ set(
         Source/HexagonView.cpp
         Source/HexEngine.cpp
         Source/HexMap.cpp
+        Source/HexCompute.cpp
+        ForwardDecl.h
 )
 
 set(

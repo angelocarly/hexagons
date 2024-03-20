@@ -5,11 +5,12 @@
 #ifndef HEXAGONS_HEXENGINE_H
 #define HEXAGONS_HEXENGINE_H
 
+#include "hexagons/HexagonView.h"
+#include "hexagons/ForwardDecl.h"
+
 #include "burst/AssetLoader.h"
 #include "burst/Engine.h"
-
-#include "hexagons/HexagonView.h"
-#include "HexMap.h"
+#include "HexCompute.h"
 
 namespace hex
 {
@@ -27,9 +28,9 @@ namespace hex
             virtual void Update( float inDelta ) override;
 
         private:
-            static const int kRadius = 10;
-            using HexMapImpl = HexMap< float, kRadius >;
             HexMapImpl mHexMap;
+
+            HexCompute mHexCompute = HexCompute( mHexMap );
 
             float mHexSize = 15.0f;
             std::shared_ptr< hex::HexagonView< float, HexMapImpl::kElementCount > > mHexagonView;
