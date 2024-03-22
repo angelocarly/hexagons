@@ -23,20 +23,11 @@ namespace hex
     class HexagonView
     {
         public:
-            struct ColorFunction
-            {
-                glm::vec4 mColorA;
-                glm::vec4 mColorB;
-                glm::vec4 mColorC;
-                glm::vec4 mColorD;
-                float tScale;
-            };
-
             HexagonView( const burst::PresentContext & inContext, glm::ivec2 inResolution, std::size_t inBufferElements );
             ~HexagonView();
 
             void Update( float inDelta );
-            void Compute( vk::CommandBuffer inCommandBuffer, float inHexSize, std::span< float > inData, ColorFunction const & inColorFunction );
+            void Compute( vk::CommandBuffer inCommandBuffer, float inHexSize, std::span< float > inData, float inColorScale );
 
         private:
             vkt::Device const & mDevice;
@@ -50,16 +41,15 @@ namespace hex
                 int height;
                 float hexSize;
                 float tScale;
-                glm::vec4 mColorA;
-                glm::vec4 mColorB;
-                glm::vec4 mColorC;
-                glm::vec4 mColorD;
             };
 
             vkt::DescriptorSetLayoutsPtr mComputeDescriptorSetLayout;
             vkt::ComputePipelinePtr mComputePipeline;
 
             vkt::BufferPtr mBuffer;
+
+            vkt::BufferPtr mColorBuffer;
+            std::shared_ptr< burst::Image > mColorImage;
 
     };
 }

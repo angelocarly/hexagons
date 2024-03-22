@@ -84,12 +84,12 @@ hex::HexCompute::Write( bool inShowPerLayer, int inLayerDepth )
         {
             if( node.depth == inLayerDepth )
             {
-                mHexMap[ pos ] += 10;
+                mHexMap[ pos ] += 0.1f;
             }
         }
         else
         {
-            mHexMap[ pos ] += node.depth;
+            mHexMap[ pos ] += float( node.depth ) / 10.0f;
         }
     } );
     v.Process();
