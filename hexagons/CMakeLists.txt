@@ -1,10 +1,11 @@
 set(
     HEADER_FILES
+        ForwardDecl.h
+        GridUtils.h
         HexagonView.h
         HexEngine.h
         HexMap.h
         HexCompute.h
-        GridUtils.h
 )
 
 set(
@@ -14,7 +15,6 @@ set(
         Source/HexEngine.cpp
         Source/HexMap.cpp
         Source/HexCompute.cpp
-        ForwardDecl.h
 )
 
 set(

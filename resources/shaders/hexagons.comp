@@ -8,6 +8,11 @@ layout(push_constant) uniform PushConstantsBlock
     int mWidth;
     int mHeight;
     float mhexSize; // Size in pixels
+    float mTScale;
+    vec4 mColorA;
+    vec4 mColorB;
+    vec4 mColorC;
+    vec4 mColorD;
 } PushConstants;
 
 layout ( binding = 0 ) buffer InHexBuffer
@@ -100,8 +105,10 @@ vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d )
 vec3 calcColor( vec2 inWorldPos )
 {
     vec3 hexPos = screenPosToHexCoord( inWorldPos, float( PushConstants.mhexSize ) );
+    float value = readHex( hexPos );
+    value *= PushConstants.mTScale;
 
-    return palette( readHex( hexPos ), vec3(0.5, 0.5, 0.5), vec3( 0.5, 0.5, 0.5), vec3( 1.0, 1.0, 0.5 ), vec3( 0.80, 0.90, 0.30 ) );
+    return palette( value, PushConstants.mColorA.rgb, PushConstants.mColorB.rgb, PushConstants.mColorC.rgb, PushConstants.mColorD.rgb );
 }
 
 void main()
