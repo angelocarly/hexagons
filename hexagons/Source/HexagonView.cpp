@@ -103,16 +103,7 @@ hex::HexagonView::HexagonView( const burst::PresentContext & inContext, glm::ive
 
     std::uint8_t * data = ( std::uint8_t * ) mColorBuffer->MapMemory();
     FillBuffer( std::span< std::uint8_t >( data, colorSamples * 4 ),
-        {
-            "d9ed92",
-            "b5e48c",
-            "99d98c",
-            "76c893",
-            "52b69a",
-            "34a0a4",
-            "168aad",
-            "1a759f",
-        }
+        { "001219","005f73","0a9396","94d2bd","e9d8a6","ee9b00","ca6702","bb3e03" }
     );
     mColorBuffer->UnMapMemory();
 

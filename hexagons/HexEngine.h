@@ -36,7 +36,7 @@ namespace hex
             bool mShowPerLayer = false;
             int mViewDepth;
 
-            float mHexSize = 15.0f;
+            float mHexSize = 100.0f;
             std::shared_ptr< hex::HexagonView > mHexagonView;
     };
 }

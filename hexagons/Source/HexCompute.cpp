@@ -20,7 +20,7 @@ hex::HexCompute::HexCompute( HexMapImpl & inMap )
         { 1, 1, 1, 1, 1, 1 }
     } );
     mOperations.push_back( Operation {
-        GridUtils::createLine( glm::ivec3( 3, -3, 0 ) ),
+        GridUtils::createLine( glm::ivec3( 2, -2, 0 ) ),
         { 0, 0 }
     } );
 
@@ -89,7 +89,8 @@ hex::HexCompute::Write( bool inShowPerLayer, int inLayerDepth )
         }
         else
         {
-            mHexMap[ pos ] += float( node.depth ) / 10.0f;
+            float val = .1f * pow( 1.0f - ( node.depth / 14.0f ), 1 );
+            mHexMap[ pos ] += val;
         }
     } );
     v.Process();
