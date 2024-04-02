@@ -24,6 +24,11 @@ namespace
         out[ 2 ] = HexToInt( inColor.substr( 4, 2 ) );
         out[ 3 ] = 255;
 
+        for( int i = 0; i < 4; i++ )
+        {
+            out[ i ] = std::uint8_t( pow(out[ i ] / 255.0f, 2.2f ) * 255 );
+        }
+
         return out;
     }
 
@@ -32,6 +37,7 @@ namespace
         for( int i = 0; i < inColors.size(); i++ )
         {
             auto c = HexToColor( inColors.at( i ) );
+//            auto c = HexToColor( inColors.at( inColors.size() - i - 1 ) );
             inSpan[ i * 4 + 0 ] = c[ 0 ];
             inSpan[ i * 4 + 1 ] = c[ 1 ];
             inSpan[ i * 4 + 2 ] = c[ 2 ];
@@ -103,7 +109,7 @@ hex::HexagonView::HexagonView( const burst::PresentContext & inContext, glm::ive
 
     std::uint8_t * data = ( std::uint8_t * ) mColorBuffer->MapMemory();
     FillBuffer( std::span< std::uint8_t >( data, colorSamples * 4 ),
-        { "001219","005f73","0a9396","94d2bd","e9d8a6","ee9b00","ca6702","bb3e03" }
+        {"003f5c","2f4b7c","665191","a05195","d45087","f95d6a","ff7c43","ffa600"}
     );
     mColorBuffer->UnMapMemory();
 

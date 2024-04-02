@@ -110,6 +110,12 @@ vec3 calcColor( vec2 inWorldPos )
     value = min( 1.0f, value );
     value = max( 0.0f, value );
 
+    // Fix almost invisible colors being the same as the background
+    if( value == 0.0f )
+    {
+        value = 1.0f;
+    }
+    
     vec4 col = texture( inColor, value );
     return col.rgb;
 }

@@ -20,7 +20,8 @@ hex::Engine::Update( float inDelta )
     {
         ImGui::SliderFloat( "Hex size", &mHexSize, 1.0f, 500.0f );
 
-        ImGui::SliderFloat( "t scale", & mColorScale, 0.0f, 3.0f );
+        ImGui::SliderFloat( "t scale", & mColorScale, 0.0f, 0.4f );
+//        mColorScale = ( sin( GetRunTime() / 2 ) / 2.0f + 0.5f ) * 0.07f + 0.00005f;
 
         if( ImGui::Button( "Step" ) )
         {
